@@ -1,4 +1,17 @@
 <?php
-// There is nothing output here because block themes do not use php templates.
-// There is a core ticket discussing removing this requirement for block themes:
-// https://core.trac.wordpress.org/ticket/54272.
+get_header(); 
+?>
+
+<main id="main-content" class="main-container">
+    <?php
+    if ( have_posts() ) :
+        while ( have_posts() ) : the_post();
+            the_content();
+        endwhile;
+    endif;
+    ?>
+</main>
+
+<?php
+get_footer(); 
+?>
