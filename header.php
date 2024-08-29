@@ -14,6 +14,7 @@
     <meta charset="<?php bloginfo( 'charset' ); ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="profile" href="https://gmpg.org/xfn/11">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
     <?php wp_head(); ?>
 </head>
 
@@ -21,6 +22,7 @@
 
 <?php
 $header_created_with_elementor = get_theme_mod( 'header_created_with_elementor', false );
+echo '<!-- Header Created with Elementor: ' . esc_html($header_created_with_elementor) . ' -->';
 
 if ( ! $header_created_with_elementor ) :
 ?>
@@ -57,7 +59,6 @@ else :
 endif;
 ?>
 
-
 <style>
     #site-navigation .menu-wrapper li a {
         color: <?php echo esc_attr( get_theme_mod( 'header_menu_color', '#000000' ) ); ?>;
@@ -67,6 +68,5 @@ endif;
         color: <?php echo esc_attr( get_theme_mod( 'header_menu_hover_color', '#ff5722' ) ); ?>;
     }
 </style>
-
 
 <div id="content" class="site-content">
