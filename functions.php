@@ -81,7 +81,7 @@ function ittech_register_menus() {
 add_action( 'init', 'ittech_register_menus' );
 
 function ittech_enqueue_fonts() {
-    wp_enqueue_style( 'poppins-font', 'https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap', false );
+    wp_enqueue_style( 'poppins-font', 'https://fonts.googleapis.com/css?family=Outfit', false );
 }
 add_action( 'wp_enqueue_scripts', 'ittech_enqueue_fonts' );
 

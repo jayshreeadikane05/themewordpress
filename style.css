@@ -25,7 +25,7 @@ html, body {
     height: 100%;
     margin: 0;
     padding: 0;
-	font-family: 'Poppins', sans-serif;
+	font-family: 'Outfit';
    
    
 }
@@ -367,8 +367,10 @@ a {
     }
     
     .post-title {
-        font-size: 18px;
-        margin: 10px 0;
+        font-size: 40px;
+        margin: 30px 0;
+        color: #3e81db;
+        line-height: 49px;
     }
     
     .post-excerpt {
@@ -382,9 +384,18 @@ a {
     }
     
     .post-grid-item {
-        flex: 1 1 calc(100% / <?php echo get_theme_mod('post_grid_columns', 'three'); ?> - 20px);
+        flex-basis: calc(100% / var(--post-grid-columns) - 20px);
         box-sizing: border-box;
         border: 1px solid #ddd;
         padding: 10px;
     }
+    
+    .read-more-button {
+        display: inline-block;
+        text-decoration: none;
+        text-align: center;
+        transition: all 0.3s ease;
+        border: none; /* Default value */
+    }
+    
     
