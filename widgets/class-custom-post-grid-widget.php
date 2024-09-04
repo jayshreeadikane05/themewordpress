@@ -21,9 +21,11 @@ class Custom_Post_Grid_Widget extends Widget_Base {
         return 'eicon-posts-ticker';
     }
 
+   
     public function get_categories() {
-        return ['general'];
+        return [ 'a_ittech-addons' ];
     }
+
 
     protected function _register_controls() {
         $this->start_controls_section(

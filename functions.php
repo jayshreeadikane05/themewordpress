@@ -645,44 +645,50 @@ function register_custom_post_grid_widget() {
 add_action( 'elementor/widgets/register', 'register_custom_post_grid_widget' );
 
 
-// Add custom columns to the posts table in the admin
-function add_custom_columns($columns) {
-    $columns['created_date'] = __('Created Date', 'text-domain');
-    $columns['updated_date'] = __('Updated Date', 'text-domain');
+add_filter('manage_post_posts_columns', 'add_custom_date_columns');
+function add_custom_date_columns($columns) {
+    $columns['created_date'] = __('Created Date');
+    $columns['updated_date'] = __('Updated Date');
     return $columns;
 }
-add_filter('manage_posts_columns', 'add_custom_columns');
 
-// Populate the custom columns with data
-function custom_column_content($column_name, $post_id) {
-    if ($column_name == 'created_date') {
-        echo get_the_date('F j, Y', $post_id);  // Display created (publish) date
+// Populate custom columns with data
+add_action('manage_post_posts_custom_column', 'custom_date_column_content', 10, 2);
+function custom_date_column_content($column, $post_id) {
+    if ($column == 'created_date') {
+        echo get_the_date('Y-m-d H:i:s', $post_id);
     }
-    
-    if ($column_name == 'updated_date') {
-        $updated_date = get_the_modified_date('F j, Y', $post_id);
-        
-        if ($updated_date !== get_the_date('F j, Y', $post_id)) {
-            echo $updated_date;  // Display updated date if it's different from the created date
-        } else {
-            echo __('—');  // If not updated, show dash or no data symbol
-        }
+    if ($column == 'updated_date') {
+        echo get_the_modified_date('Y-m-d H:i:s', $post_id);
     }
 }
-add_action('manage_posts_custom_column', 'custom_column_content', 10, 2);
 
 // Make custom columns sortable
+add_filter('manage_edit-post_sortable_columns', 'sortable_custom_columns');
 function sortable_custom_columns($columns) {
     $columns['created_date'] = 'date';
     $columns['updated_date'] = 'modified';
     return $columns;
 }
-add_filter('manage_edit-post_sortable_columns', 'sortable_custom_columns');
 
+// Handle sorting for custom columns
+add_action('pre_get_posts', 'sort_custom_date_columns');
+function sort_custom_date_columns($query) {
+    if (!is_admin()) return;
+
+    $orderby = $query->get('orderby');
+
+    if ('date' == $orderby) {
+        $query->set('orderby', 'date');
+    }
+
+    if ('modified' == $orderby) {
+        $query->set('orderby', 'modified');
+    }
+}
 
 // Add the export button to the posts admin page
 add_action('admin_footer-edit.php', 'add_export_button');
-
 function add_export_button() {
     $screen = get_current_screen();
     
@@ -697,7 +703,6 @@ function add_export_button() {
         <?php
     }
 }
-
 // Handle the export action
 add_action('admin_post_export_posts_to_excel', 'export_posts_to_excel');
 
@@ -716,6 +721,8 @@ function export_posts_to_excel() {
     $sheet->setCellValue('D1', 'Author');
     $sheet->setCellValue('E1', 'Categories');
     $sheet->setCellValue('F1', 'Tags');
+    $sheet->setCellValue('G1', 'Post URL');
+    $sheet->setCellValue('H1', 'Featured Image URL');
 
     // Get all posts
     $args = [
@@ -740,6 +747,17 @@ function export_posts_to_excel() {
         $tags = wp_get_post_terms($post->ID, 'post_tag', ['fields' => 'names']);
         $sheet->setCellValue('F' . $row, implode(', ', $tags));
 
+        // Post URL
+        $sheet->setCellValue('G' . $row, get_permalink($post));
+
+        // Featured Image URL
+        if (has_post_thumbnail($post)) {
+            $image_url = get_the_post_thumbnail_url($post, 'full');
+            $sheet->setCellValue('H' . $row, $image_url);
+        } else {
+            $sheet->setCellValue('H' . $row, 'No Featured Image');
+        }
+
         $row++;
     }
 
@@ -754,5 +772,6 @@ function export_posts_to_excel() {
     $writer->save('php://output');
     exit;
 }
+
 
 
