@@ -590,6 +590,18 @@ function ittech_postgrid_customize_register( $wp_customize ) {
 }
 add_action( 'customize_register', 'ittech_postgrid_customize_register' );
 
+function ittech_addon_register_widget_categories( $elements_manager ) {
+    $elements_manager->add_category(
+        'a_ittech-addons',
+        [
+            'title' => __( 'ITtech Addons', 'plugin-name' ),
+            'icon' => 'fa fa-plug', // Optional icon for your category
+        ],
+        1
+    );
+}
+add_action( 'elementor/elements/categories_registered', 'ittech_addon_register_widget_categories' );
+
 function register_post_grid_widget() {
     if ( defined( 'ELEMENTOR_VERSION' ) ) {
         $widget_file = get_template_directory() . '/widgets/elementor-post-grid-widget.php';
@@ -603,5 +615,144 @@ function register_post_grid_widget() {
 }
 add_action( 'elementor/widgets/register', 'register_post_grid_widget' );
 
+
+// Add this to your plugin or theme's functions.php file
+
+
+
+
+function register_custom_post_grid_widget() {
+    // Check if Elementor is active
+    if ( defined( 'ELEMENTOR_VERSION' ) ) {
+        // Define the widget file path
+        $widget_file = get_template_directory() . '/widgets/class-custom-post-grid-widget.php';
+        
+        // Check if the file exists
+        if ( file_exists( $widget_file ) ) {
+            // Require the widget file
+            require_once( $widget_file );
+            
+            // Register the widget
+            \Elementor\Plugin::instance()->widgets_manager->register_widget_type( new \Elementor\Custom_Post_Grid_Widget() );
+        } else {
+            // Log error if the file is not found
+            error_log('Elementor Post Grid Widget file not found: ' . $widget_file);
+        }
+    }
+}
+
+// Register the widget with Elementor
+add_action( 'elementor/widgets/register', 'register_custom_post_grid_widget' );
+
+
+// Add custom columns to the posts table in the admin
+function add_custom_columns($columns) {
+    $columns['created_date'] = __('Created Date', 'text-domain');
+    $columns['updated_date'] = __('Updated Date', 'text-domain');
+    return $columns;
+}
+add_filter('manage_posts_columns', 'add_custom_columns');
+
+// Populate the custom columns with data
+function custom_column_content($column_name, $post_id) {
+    if ($column_name == 'created_date') {
+        echo get_the_date('F j, Y', $post_id);  // Display created (publish) date
+    }
+    
+    if ($column_name == 'updated_date') {
+        $updated_date = get_the_modified_date('F j, Y', $post_id);
+        
+        if ($updated_date !== get_the_date('F j, Y', $post_id)) {
+            echo $updated_date;  // Display updated date if it's different from the created date
+        } else {
+            echo __('—');  // If not updated, show dash or no data symbol
+        }
+    }
+}
+add_action('manage_posts_custom_column', 'custom_column_content', 10, 2);
+
+// Make custom columns sortable
+function sortable_custom_columns($columns) {
+    $columns['created_date'] = 'date';
+    $columns['updated_date'] = 'modified';
+    return $columns;
+}
+add_filter('manage_edit-post_sortable_columns', 'sortable_custom_columns');
+
+
+// Add the export button to the posts admin page
+add_action('admin_footer-edit.php', 'add_export_button');
+
+function add_export_button() {
+    $screen = get_current_screen();
+    
+    // Check if we are on the posts admin page
+    if ($screen->post_type == 'post' && $screen->base == 'edit') {
+        ?>
+        <script type="text/javascript">
+            jQuery(document).ready(function($) {
+                $('<a href="<?php echo admin_url('admin-post.php?action=export_posts_to_excel'); ?>" class="button action">Export Posts to Excel</a>').appendTo('.tablenav.top .actions.bulkactions');
+            });
+        </script>
+        <?php
+    }
+}
+
+// Handle the export action
+add_action('admin_post_export_posts_to_excel', 'export_posts_to_excel');
+
+function export_posts_to_excel() {
+    // Include PhpSpreadsheet library
+    require_once __DIR__ . '/vendor/autoload.php';
+
+    // Create new Spreadsheet object
+    $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+    $sheet = $spreadsheet->getActiveSheet();
+
+    // Set headers for Excel sheet
+    $sheet->setCellValue('A1', 'Title');
+    $sheet->setCellValue('B1', 'Created Date');
+    $sheet->setCellValue('C1', 'Updated Date');
+    $sheet->setCellValue('D1', 'Author');
+    $sheet->setCellValue('E1', 'Categories');
+    $sheet->setCellValue('F1', 'Tags');
+
+    // Get all posts
+    $args = [
+        'post_type' => 'post',
+        'post_status' => 'publish',
+        'posts_per_page' => -1,
+    ];
+    $posts = get_posts($args);
+
+    $row = 2; // Start from the second row for data
+    foreach ($posts as $post) {
+        $sheet->setCellValue('A' . $row, $post->post_title);
+        $sheet->setCellValue('B' . $row, get_the_date('Y-m-d', $post));
+        $sheet->setCellValue('C' . $row, get_the_modified_date('Y-m-d', $post));
+        $sheet->setCellValue('D' . $row, get_the_author_meta('display_name', $post->post_author));
+
+        // Get categories
+        $categories = wp_get_post_terms($post->ID, 'category', ['fields' => 'names']);
+        $sheet->setCellValue('E' . $row, implode(', ', $categories));
+
+        // Get tags
+        $tags = wp_get_post_terms($post->ID, 'post_tag', ['fields' => 'names']);
+        $sheet->setCellValue('F' . $row, implode(', ', $tags));
+
+        $row++;
+    }
+
+    // Set the file name and headers for download
+    $file_name = 'posts-export-' . date('Y-m-d') . '.xlsx';
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    header('Content-Disposition: attachment;filename="' . $file_name . '"');
+    header('Cache-Control: max-age=0');
+
+    // Create Excel file and force download
+    $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+    $writer->save('php://output');
+    exit;
+}
 
 
