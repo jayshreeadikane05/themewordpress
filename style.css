@@ -486,6 +486,7 @@ a {
 
 .post-image {
     flex: 0 0 150px; /* Adjust the width of the image container */
+    width: 100%;
    
 }
 

@@ -555,41 +555,6 @@ add_action( 'save_post', 'ittech_save_page_visibility_meta' );
 
 
 
-
-function ittech_postgrid_customize_register( $wp_customize ) {
-    $wp_customize->add_section(
-        'post_grid_settings',
-        array(
-            'title'    => __( 'Post Grid Settings', 'ittech' ),
-            'priority' => 30,
-        )
-    );
-
-    $wp_customize->add_setting(
-        'post_grid_columns',
-        array(
-            'default' => 'three',
-            'transport' => 'refresh',
-        )
-    );
-
-    $wp_customize->add_control(
-        'post_grid_columns',
-        array(
-            'label'   => __( 'Number of Columns', 'ittech' ),
-            'section' => 'post_grid_settings',
-            'type'    => 'select',
-            'choices' => array(
-                'one'   => __( 'One Column', 'ittech' ),
-                'two'   => __( 'Two Columns', 'ittech' ),
-                'three' => __( 'Three Columns', 'ittech' ),
-                'four'  => __( 'Four Columns', 'ittech' ),
-            ),
-        )
-    );
-}
-add_action( 'customize_register', 'ittech_postgrid_customize_register' );
-
 function ittech_addon_register_widget_categories( $elements_manager ) {
     $elements_manager->add_category(
         'a_ittech-addons',

@@ -143,7 +143,29 @@ class Post_Grid_Widget extends Widget_Base {
             ]
         );
         
-
+        $posts = get_posts( array(
+            'post_type' => 'post',
+            'posts_per_page' => -1,
+            'post_status' => 'publish',
+        ) );
+        
+        $post_options = array();
+        foreach ( $posts as $post ) {
+            $post_options[ $post->ID ] = $post->post_title . ' (' . $post->post_name . ')'; 
+        }
+        
+        $this->add_control(
+            'selected_posts',
+            [
+                'label' => __( 'Select Posts (by Title or Slug)', 'plugin-name' ),
+                'type' => Controls_Manager::SELECT2,
+                'options' => $post_options,
+                'multiple' => true,
+                'label_block' => true,
+                'default' => [],
+            ]
+        );
+        
       
         
         $this->add_responsive_control(
@@ -653,6 +675,8 @@ class Post_Grid_Widget extends Widget_Base {
             'order' => $order_by, 
             'category__in' => !empty($settings['selected_categories']) ? $settings['selected_categories'] : '',
             'tag__in' => !empty($settings['selected_tags']) ? $settings['selected_tags'] : '',
+            'post__in' => !empty($settings['selected_posts']) ? $settings['selected_posts'] : [], 
+
         );
         $query = new WP_Query($args);
         
@@ -700,7 +724,7 @@ class Post_Grid_Widget extends Widget_Base {
             echo '<p>No posts found.</p>';
         endif;
         
-        echo '</div>'; // Close the unique container
+        echo '</div>'; 
     }
     
     

@@ -248,8 +248,33 @@ class Custom_Post_Grid_Widget extends Widget_Base {
                 'default' => [],
             ]
         );
+
+
+        $posts = get_posts( array(
+            'post_type' => 'post',
+            'posts_per_page' => -1,
+            'post_status' => 'publish',
+        ) );
+        
+        $post_options = array();
+        foreach ( $posts as $post ) {
+            $post_options[ $post->ID ] = $post->post_title . ' (' . $post->post_name . ')'; 
+        }
+        
+        $this->add_control(
+            'selected_posts',
+            [
+                'label' => __( 'Select Posts (by Title or Slug)', 'plugin-name' ),
+                'type' => Controls_Manager::SELECT2,
+                'options' => $post_options,
+                'multiple' => true,
+                'label_block' => true,
+                'default' => [],
+            ]
+        );
     
         $this->end_controls_section();
+
         $this->start_controls_section(
             'style_title_section',
             [
@@ -1161,7 +1186,40 @@ class Custom_Post_Grid_Widget extends Widget_Base {
                 ],
             ]
         );
-
+        $this->add_control(
+            'min_width',
+            [
+                'label' => __( 'Minimum Width', 'plugin-name' ),
+                'type' => \Elementor\Controls_Manager::SLIDER,
+                'size_units' => [ 'px', '%', 'em', 'rem' ],
+                'range' => [
+                    'px' => [
+                        'min' => 0,
+                        'max' => 1200,
+                    ],
+                    '%' => [
+                        'min' => 0,
+                        'max' => 100,
+                    ],
+                    'em' => [
+                        'min' => 0,
+                        'max' => 100,
+                    ],
+                    'rem' => [
+                        'min' => 0,
+                        'max' => 100,
+                    ],
+                ],
+                'default' => [
+                    'unit' => '%',
+                    'size' => 30,
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .small-posts' => 'min-width: {{SIZE}}{{UNIT}};',
+                ],
+            ]
+        );
+        
         $this->end_controls_section();
 
     }
@@ -1200,6 +1258,7 @@ class Custom_Post_Grid_Widget extends Widget_Base {
             'order' => $order_by,
             'category__in' => !empty($settings['selected_categories']) ? $settings['selected_categories'] : '',
             'tag__in' => !empty($settings['selected_tags']) ? $settings['selected_tags'] : '',
+            'post__in' => !empty($settings['selected_posts']) ? $settings['selected_posts'] : [], 
         );
     
         $query = new \WP_Query($args);
