@@ -13,20 +13,21 @@
                 </p>
             </div>
             
-            <div class="post-categories">
-                <?php
-                $categories = get_the_category();
-                if ( ! empty( $categories ) ) {
-                    foreach ( $categories as $category ) {
-                        echo '<span class="category-badge">' . esc_html( $category->name ) . '</span>';
+              <div class="post-categories">
+                    <?php
+                    $categories = get_the_category();
+                    if ( ! empty( $categories ) ) {
+                        foreach ( $categories as $category ) {
+                            $category_link = get_category_link( $category->term_id );
+                            echo '<a href="' . esc_url( $category_link ) . '" class="category-badge">' . esc_html( $category->name ) . '</a>';
+                        }
                     }
-                }
-                ?>
+                    ?>
             </div>
 
             <?php if ( has_post_thumbnail() ) : ?>
                 <div class="post-thumbnail">
-                    <?php the_post_thumbnail( 'custom-thumb' ); ?>
+                    <?php the_post_thumbnail(); ?>
                 </div>
             <?php endif; ?>
             
@@ -50,8 +51,21 @@ if ( !empty( $selected_sidebar ) && $selected_sidebar != 'none' && is_active_sid
 
 
 </div>
+<div class="bottom-sidebar">
+<?php
+        $selected_sidebar_bottom = isset( $selected_sidebar_bottom ) ? $selected_sidebar_bottom : 'custom-bottom-ads'; 
 
-<div class="blog-container">
+
+// Check if a sidebar is selected and it is not set to 'none'
+if ( !empty( $selected_sidebar_bottom ) && $selected_sidebar_bottom != 'none' && is_active_sidebar( $selected_sidebar_bottom ) ) : ?>
+    <div class="bottom-sidebar-append">
+        <?php dynamic_sidebar( $selected_sidebar_bottom ); // Display the selected sidebar ?>
+    </div>
+<?php endif; ?>
+</div>
+
+
+<div class="blog-container-post">
     <div class="recent-posts-navigation">
         <div class="previous-post">
             <h3>Previous</h3>

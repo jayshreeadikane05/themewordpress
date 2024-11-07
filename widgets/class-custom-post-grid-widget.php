@@ -195,7 +195,17 @@ class Custom_Post_Grid_Widget extends Widget_Base {
             ]
         );
     
-       
+          $this->add_control(
+            'excerpt_word_count',
+            [
+                'label' => __( 'Excerpt Word Count', 'plugin-name' ),
+                'type' => Controls_Manager::NUMBER,
+                'default' => 20,  // Default word count
+                'condition' => [
+                    'display_excerpt_small' => 'yes',
+                ],
+            ]
+        );
         $this->add_control(
             'display_categories',
             [
@@ -1246,7 +1256,7 @@ class Custom_Post_Grid_Widget extends Widget_Base {
         $show_read_more_small = $settings['show_read_more_small'] === 'yes';
         $display_excerpt = $settings['display_excerpt'] === 'yes';
         $display_excerpt_small = $settings['display_excerpt_small'] === 'yes';
-
+		 $excerpt_word_count = $settings['excerpt_word_count'];
         
     
         $featured_image_width = !empty($settings['featured_image_width']['size']) ? $settings['featured_image_width']['size'] . $settings['featured_image_width']['unit'] : 'auto';
@@ -1270,13 +1280,13 @@ class Custom_Post_Grid_Widget extends Widget_Base {
                     $query->the_post();
                     echo '<div class="large-post">';
                     if ($show_image && has_post_thumbnail()) {
-                        echo '<a href="' . get_the_permalink() . '">';
-                        echo '<div class="post-image">' . get_the_post_thumbnail() . '</div>';
+                        echo '<a href="' . get_the_permalink() . '" target="_blank">';
+                        echo '<div class="post-image zoom-effect"><div class="image-inner">' . get_the_post_thumbnail() . '</div></div>';
                         echo '</a>';    
                     }
                     if ($show_title) {
-                        echo '<a href="' . get_the_permalink() . '">';
-                        echo ' <h2 class="post-title">' . get_the_title() . '</h2>';
+                        echo '<a href="' . get_the_permalink() . '" target="_blank">';
+                        echo ' <h2 class="post-title hover-effect">' . get_the_title() . '</h2>';
                         echo '</a>';
                     }
                     if ('yes' === $settings['display_excerpt']) {
@@ -1286,10 +1296,12 @@ class Custom_Post_Grid_Widget extends Widget_Base {
                         echo '<div class="post-date">' . get_the_date() . '</div>';
                     }
                     if ($display_excerpt) {
-                        echo '<div class="post-excerpt">' . get_the_excerpt() . '</div>';
+                       $excerpt = wp_trim_words( get_the_excerpt(), $excerpt_word_count );
+
+                        echo '<div class="post-excerpt">' . $excerpt . '</div>';
                     }
                     if ($show_read_more) {
-                        echo '<a href="' . get_permalink() . '" class="read-more-button">' . __('Read More', 'text-domain') . '</a>';
+                        echo '<a href="' . get_permalink() . '" target="_blank" class="read-more-button">' . __('Read More', 'text-domain') . '</a>';
                     }
                     echo '</div>';
                     echo '<div class="small-posts">';
@@ -1297,24 +1309,25 @@ class Custom_Post_Grid_Widget extends Widget_Base {
                         $query->the_post();
                         echo '<div class="small-post">';
                         if ($show_image_small && has_post_thumbnail()) {
-                            echo '<a href="' . get_the_permalink() . '">';
-                            echo '<div class="small-post-image">' . get_the_post_thumbnail() . '</div>';
+                            echo '<a href="' . get_the_permalink() . '" target="_blank">';
+                            echo '<div class="small-post-image zoom-effect"><div class="image-inner">' . get_the_post_thumbnail() . '</div></div>';
                             echo '</a>';
                         }
                         echo '<div class="post-content">';
                         if ($show_title) {
-                            echo '<a href="' . get_the_permalink() . '">';
-                            echo ' <h2 class="small-post-title">' . get_the_title() . '</h2>';
+                            echo '<a href="' . get_the_permalink() . '" target="_blank">';
+                            echo ' <h2 class="small-post-title hover-effect">' . get_the_title() . '</h2>';
                             echo '</a>';
                         }
                         if ($display_date_small) {
                             echo '<div class="post-date">' . get_the_date() . '</div>';
                         }
                         if ($display_excerpt_small) {
-                            echo '<div class="post-excerpt">' . get_the_excerpt() . '</div>';
+                         $excerpt = wp_trim_words( get_the_excerpt(), $excerpt_word_count );
+                            echo '<div class="post-excerpt">' . $excerpt . '</div>';
                         }
                         if ($show_read_more_small) {
-                            echo '<a href="' . get_permalink() . '" class="read-more small-read-more-button">' . __('Read More', 'text-domain') . '</a>';
+                            echo '<a href="' . get_permalink() . '" target="_blank" class="read-more small-read-more-button">' . __('Read More', 'text-domain') . '</a>';
                         }
                      
                       
@@ -1326,16 +1339,18 @@ class Custom_Post_Grid_Widget extends Widget_Base {
                 }
             }  elseif ($layout == 'layout3') {
                 $posts = $query->get_posts();
+                $total_posts = count($posts);
                 if (count($posts) > 1) {
                     echo '<div class="small-posts layout3">';
-                    for ($i = 0; $i < count($posts) - 1; $i++) {
+                    for ($i = 0; $i < $total_posts - 1; $i++) {
                         $post = $posts[$i]; 
-                    
+                        $GLOBALS['post'] = $post; 
+                        setup_postdata($post); 
                         echo '<div class="small-post">';
                         echo '<div class="post-content">'; 
                         if ($show_title) {
-                            echo '<a href="' . get_the_permalink() . '">';
-                            echo ' <h2 class="small-post-title">' . get_the_title() . '</h2>';
+                            echo '<a href="' . get_the_permalink() . '" target="_blank">';
+                            echo ' <h2 class="small-post-title hover-effect">' . get_the_title() . '</h2>';
                             echo '</a>';
                         }
                       
@@ -1343,15 +1358,17 @@ class Custom_Post_Grid_Widget extends Widget_Base {
                             echo '<div class="post-date">' . get_the_date('', $post->ID) . '</div>';
                         }
                         if ($display_excerpt_small) {
-                            echo '<div class="post-excerpt">' . get_the_excerpt($post->ID) . '</div>'; 
+                         $excerpt = wp_trim_words( get_the_excerpt(), $excerpt_word_count );
+                            echo '<div class="post-excerpt">' . $excerpt . '</div>'; 
                         }
                         if ($show_read_more_small) {
-                            echo '<a href="' . get_permalink($post->ID) . '" class="read-more small-read-more-button">' . __('Read More', 'text-domain') . '</a>';
+                            echo '<a href="' . get_permalink($post->ID) . '" target="_blank" class="read-more small-read-more-button">' . __('Read More', 'text-domain') . '</a>';
                         }
                         echo '</div>';
             
                         if ($show_image_small && has_post_thumbnail($post->ID)) {
-                            echo '<div class="small-post-image">' . get_the_post_thumbnail($post->ID) . '</div>'; 
+                            echo '<div class="small-post-image zoom-effect"><div class="image-inner">' . get_the_post_thumbnail($post->ID) . '</div></div>';
+
                         }
             
                         echo '</div>'; 
@@ -1362,23 +1379,26 @@ class Custom_Post_Grid_Widget extends Widget_Base {
                     echo '<div class="large-post">';
                     
                     if ($show_image && has_post_thumbnail($last_post->ID)) {
-                        echo '<a href="' . get_the_permalink() . '">';
-                        echo '<div class="post-image">' . get_the_post_thumbnail($last_post->ID) . '</div>';
+                        echo '<a href="' . get_the_permalink($last_post->ID) . '" target="_blank">';
+                  
+                        echo '<div class="post-image zoom-effect"><div class="image-inner">' . get_the_post_thumbnail($last_post->ID) . '</div></div>';
+
                         echo '</a>';
                     }
                     if ($show_title) {
-                        echo '<a href="' . get_the_permalink() . '">';
-                        echo '<h3>' . get_the_title($last_post->ID) . '</h3>'; 
+                        echo '<a href="' . get_permalink($last_post->ID) . '" target="_blank">';
+                        echo '<h3 class="hover-effect">' . get_the_title($last_post->ID) . '</h3>'; 
                         echo '</a>';
                     }
                     if ($display_excerpt) {
-                        echo '<div class="post-excerpt">' . get_the_excerpt($last_post->ID) . '</div>';
+                    $excerpt = wp_trim_words( get_the_excerpt(), $excerpt_word_count );
+                        echo '<div class="post-excerpt">' . $excerpt . '</div>';
                     }
                     if ($display_date) {
                         echo '<div class="post-date">' . get_the_date('', $last_post->ID) . '</div>';
                     }
                     if ($show_read_more) {
-                        echo '<a href="' . get_permalink($post->ID) . '" class="read-more read-more-button">' . __('Read More', 'text-domain') . '</a>';
+                        echo '<a href="' . get_permalink($post->ID) . '" target="_blank" class="read-more read-more-button">' . __('Read More', 'text-domain') . '</a>';
                     }
                   
                     echo '</div>';

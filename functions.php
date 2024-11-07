@@ -80,8 +80,12 @@ function ittech_register_menus() {
 }
 add_action( 'init', 'ittech_register_menus' );
 
+
+
 function ittech_enqueue_fonts() {
-    wp_enqueue_style( 'poppins-font', 'https://fonts.googleapis.com/css?family=Outfit', false );
+    // Add preconnect for Google Fonts
+    wp_enqueue_style( 'ittech-fonts-preconnect', 'https://fonts.gstatic.com', [], null, 'preconnect' );
+    wp_enqueue_style( 'poppins-font', 'https://fonts.googleapis.com/css?family=Montserrat', [], null );
 }
 add_action( 'wp_enqueue_scripts', 'ittech_enqueue_fonts' );
 
@@ -531,6 +535,53 @@ function ittech_page_visibility_meta_box_callback( $post ) {
 }
 
 
+// Bottom Sidebar
+
+function ittech_add_bottom_sidebar_meta_box() {
+    add_meta_box(
+        'ittech_bottom_sidebar',
+        __( 'Bottom Sidebar', 'ittech' ), 
+        'ittech_bottom_sidebar_meta_box_callback', 
+        'post', 
+        'side', 
+        'default' 
+    );
+}
+add_action( 'add_meta_boxes', 'ittech_add_bottom_sidebar_meta_box' );
+
+// Meta box display callback
+function ittech_bottom_sidebar_meta_box_callback( $post ) {
+    // Retrieve saved bottom sidebar option for this post
+    $selected_sidebar = get_post_meta( $post->ID, '_ittech_bottom_sidebar', true );
+
+    // Retrieve all dynamic widget areas
+    $widget_areas = get_option( 'ittech_widget_areas', array() );
+
+    // Display a dropdown of all widget areas
+    echo '<select name="ittech_bottom_sidebar">';
+    echo '<option value="custom-bottom-ads">' . __( 'Custom Bottom ads', 'ittech' ) . '</option>';
+    foreach ( $widget_areas as $id => $name ) {
+        echo '<option value="' . esc_attr( $id ) . '"' . selected( $selected_sidebar, $id, false ) . '>' . esc_html( $name ) . '</option>';
+    }
+    echo '</select>';
+}
+
+// Save meta box data when the post is saved
+function ittech_save_bottom_sidebar_meta_box_data( $post_id ) {
+    // Check if our nonce is set and verify the nonce
+    if ( ! isset( $_POST['ittech_bottom_sidebar'] ) ) {
+        return;
+    }
+
+    // Save selected sidebar
+    $selected_sidebar = sanitize_text_field( $_POST['ittech_bottom_sidebar'] );
+    update_post_meta( $post_id, '_ittech_bottom_sidebar', $selected_sidebar );
+}
+add_action( 'save_post', 'ittech_save_bottom_sidebar_meta_box_data' );
+
+
+
+
 
 function ittech_save_page_visibility_meta( $post_id ) {
     if ( isset( $_POST['ittech_disable_title'] ) ) {
@@ -738,5 +789,154 @@ function export_posts_to_excel() {
     exit;
 }
 
+// Custom Recent Posts Widget with Category and Tag Filters
+class Recent_Posts_By_Category_Tag_Widget extends WP_Widget {
 
+    public function __construct() {
+        parent::__construct(
+            'recent_posts_by_category_tag_widget', 
+            __('Recent Posts by Category & Tag', 'text_domain'), 
+            array('description' => __('A widget that displays recent posts filtered by category and tag', 'text_domain'))
+        );
+    }
 
+    // Output the widget content
+    public function widget($args, $instance) {
+        echo $args['before_widget'];
+    
+        // Widget Title
+        if (!empty($instance['title'])) {
+            echo $args['before_title'] . apply_filters('widget_title', $instance['title']) . $args['after_title'];
+        }
+    
+        $query_args = array(
+            'post_type' => 'post',
+            'posts_per_page' => !empty($instance['post_count']) ? intval($instance['post_count']) : 5, // Default to 5 posts
+            'orderby' => 'date',
+            'order' => 'DESC',
+        );
+    
+        // Add selected categories if set
+        if (!empty($instance['categories'])) {
+            $query_args['cat'] = implode(',', $instance['categories']);
+        }
+    
+        // Add selected tags if set
+        if (!empty($instance['tags'])) {
+            $query_args['tag'] = implode(',', $instance['tags']);
+        }
+    
+        // Run the query
+        $recent_posts_query = new WP_Query($query_args);
+    
+        if ($recent_posts_query->have_posts()) {
+    echo '<ul class="recent-posts-widget">';
+    while ($recent_posts_query->have_posts()) {
+        $recent_posts_query->the_post();
+
+        // Get the featured image URL
+        $thumbnail = get_the_post_thumbnail_url(get_the_ID(), 'thumbnail');
+        $post_date = get_the_date();
+
+        echo '<li class="recent-post-item">';
+        
+        // Display featured image if it exists
+        if ($thumbnail) {
+            echo '<div class="post-thumbnail"><img src="' . esc_url($thumbnail) . '" alt="' . esc_attr(get_the_title()) . '" /></div>';
+        }
+
+        echo '<div class="post-details">';
+        echo '<a href="' . get_permalink() . '" class="post-title">' . get_the_title() . '</a>';
+        echo '<span class="post-date">' . esc_html($post_date) . '</span>';
+        echo '</div>'; // Close post-details
+
+        echo '</li>';
+    }
+    echo '</ul>';
+} else {
+    _e('No recent posts found.', 'text_domain');
+}
+
+    
+        // Restore original Post Data
+        wp_reset_postdata();
+    
+        echo $args['after_widget'];
+    }
+
+    // Backend widget form
+    public function form($instance) {
+        $title = !empty($instance['title']) ? $instance['title'] : __('Recent Posts', 'text_domain');
+        $post_count = !empty($instance['post_count']) ? $instance['post_count'] : 5;
+        $selected_categories = !empty($instance['categories']) ? $instance['categories'] : array();
+        $selected_tags = !empty($instance['tags']) ? $instance['tags'] : array();
+        $display_feature_image = !empty($instance['display_feature_image']) ? $instance['display_feature_image'] : '';
+        $display_post_date = !empty($instance['display_post_date']) ? $instance['display_post_date'] : '';
+    
+        // Fetch all categories and tags
+        $categories = get_categories();
+        $tags = get_tags();
+        ?>
+        <p>
+            <label for="<?php echo esc_attr($this->get_field_id('title')); ?>"><?php _e('Title:', 'text_domain'); ?></label>
+            <input class="widefat" id="<?php echo esc_attr($this->get_field_id('title')); ?>" name="<?php echo esc_attr($this->get_field_name('title')); ?>" type="text" value="<?php echo esc_attr($title); ?>" />
+        </p>
+
+        <p>
+            <label for="<?php echo esc_attr($this->get_field_id('post_count')); ?>"><?php _e('Number of Posts to Show:', 'text_domain'); ?></label>
+            <input class="widefat" id="<?php echo esc_attr($this->get_field_id('post_count')); ?>" name="<?php echo esc_attr($this->get_field_name('post_count')); ?>" type="number" value="<?php echo esc_attr($post_count); ?>" />
+        </p>
+
+        <p>
+            <label for="<?php echo esc_attr($this->get_field_id('categories')); ?>"><?php _e('Select Categories:', 'text_domain'); ?></label><br>
+            <select id="<?php echo esc_attr($this->get_field_id('categories')); ?>" name="<?php echo esc_attr($this->get_field_name('categories')) . '[]'; ?>" class="widefat" multiple="multiple" style="height: 150px;">
+                <?php foreach ($categories as $category) : ?>
+                    <option value="<?php echo esc_attr($category->term_id); ?>" <?php echo in_array($category->term_id, $selected_categories) ? 'selected' : ''; ?>>
+                        <?php echo esc_html($category->name); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </p>
+
+        <p>
+            <label for="<?php echo esc_attr($this->get_field_id('tags')); ?>"><?php _e('Select Tags:', 'text_domain'); ?></label><br>
+            <select id="<?php echo esc_attr($this->get_field_id('tags')); ?>" name="<?php echo esc_attr($this->get_field_name('tags')) . '[]'; ?>" class="widefat" multiple="multiple" style="height: 150px;">
+                <?php foreach ($tags as $tag) : ?>
+                    <option value="<?php echo esc_attr($tag->slug); ?>" <?php echo in_array($tag->slug, $selected_tags) ? 'selected' : ''; ?>>
+                        <?php echo esc_html($tag->name); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </p>
+
+        <p>
+            <input class="checkbox" type="checkbox" id="<?php echo esc_attr($this->get_field_id('display_feature_image')); ?>" name="<?php echo esc_attr($this->get_field_name('display_feature_image')); ?>" <?php checked($display_feature_image, 'on'); ?> />
+            <label for="<?php echo esc_attr($this->get_field_id('display_feature_image')); ?>"><?php _e('Display Feature Image', 'text_domain'); ?></label>
+        </p>
+
+        <p>
+            <input class="checkbox" type="checkbox" id="<?php echo esc_attr($this->get_field_id('display_post_date')); ?>" name="<?php echo esc_attr($this->get_field_name('display_post_date')); ?>" <?php checked($display_post_date, 'on'); ?> />
+            <label for="<?php echo esc_attr($this->get_field_id('display_post_date')); ?>"><?php _e('Display Post Date', 'text_domain'); ?></label>
+        </p>
+        <?php
+    }
+
+    // Updating widget with new values
+    public function update($new_instance, $old_instance) {
+        $instance = array();
+        $instance['title'] = (!empty($new_instance['title'])) ? strip_tags($new_instance['title']) : '';
+        $instance['post_count'] = (!empty($new_instance['post_count'])) ? intval($new_instance['post_count']) : 5;
+        $instance['categories'] = (!empty($new_instance['categories'])) ? array_map('intval', $new_instance['categories']) : array();
+        $instance['tags'] = (!empty($new_instance['tags'])) ? array_map('sanitize_text_field', $new_instance['tags']) : array();
+        $instance['display_feature_image'] = (!empty($new_instance['display_feature_image'])) ? 'on' : '';
+        $instance['display_post_date'] = (!empty($new_instance['display_post_date'])) ? 'on' : '';
+        return $instance;
+    }
+
+}
+
+// Register the widget
+function register_recent_posts_by_category_tag_widget() {
+    register_widget('Recent_Posts_By_Category_Tag_Widget');
+}
+add_action('widgets_init', 'register_recent_posts_by_category_tag_widget');

@@ -25,7 +25,7 @@ html, body {
     height: 100%;
     margin: 0;
     padding: 0;
-	font-family: 'Outfit';
+	font-family: 'Montserrat';
    
    
 }
@@ -47,7 +47,7 @@ html, body {
     padding: 0 20px; 
 }
 a:hover{
-    color: #2282ff !important;
+   
     text-decoration: none;
 }
 a {
@@ -129,7 +129,7 @@ a {
 
 
     .blog-container {
-        max-width: 1200px;
+        max-width: 1320px;
         margin: 0 auto;
         padding: 0 15px;
         display: flex;
@@ -203,7 +203,7 @@ a {
         width: 100%;
         height: auto;
         max-width: 100%;
-        max-height: 400px;
+        max-height: 500px;
     }
     .post-date {
         margin-bottom: 15px;
@@ -644,4 +644,370 @@ a {
 }
 .custom-post-grid.layout3 {
     gap: 17px;
+}
+
+
+.bottom-sidebar {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+    display: flex;
+    flex-wrap: wrap;
+}
+.bottom-sidebar-append {
+    margin : 0 auto;
+}
+
+
+
+.search-results h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.search-query {
+    font-weight: bold;
+    color: #333;
+}
+
+.search-results-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.search-result-item {
+    display: flex;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 20px;
+}
+
+.search-result-item a {
+    display: flex;
+    text-decoration: none;
+    color: inherit;
+}
+
+.search-result-thumbnail {
+    flex: 0 0 150px;
+    margin-right: 20px;
+}
+
+.search-result-thumbnail img {
+    width: 100%;
+    height: auto;
+}
+
+.search-result-content {
+    flex: 1;
+}
+
+.search-result-title {
+    font-size: 18px;
+    margin: 0;
+    color: #0073aa;
+}
+
+.search-result-title:hover {
+    text-decoration: underline;
+}
+
+.search-result-excerpt {
+    margin: 10px 0;
+    color: #555;
+}
+
+.pagination {
+    margin-top: 20px;
+}
+
+.pagination a {
+    margin: 0 5px;
+    text-decoration: none;
+    color: #0073aa;
+}
+
+.pagination a:hover {
+    text-decoration: underline;
+}
+.serach-div {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 0 15px;
+    display: flex;
+    flex-wrap: wrap;
+    border-top: 5px solid #0087DD;
+
+}
+.error-div {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 0 15px;
+    display: flex;
+    flex-wrap: wrap;
+    border-top: 5px solid #0087DD;
+    margin-bottom: 50px;
+    margin-top: 19px;
+}
+h1.primary-color {
+    font-size: 44px;
+    color: #3e82dd;
+}
+.category-badge {
+    margin-top: 13px;
+}
+.with_frm_style .frm_checkbox label, .with_frm_style .frm_radio label {
+display:block;
+}
+fieldset {
+    padding: 40px 51px 24px 31px;
+border: 1px solid #f1f0f0;
+border-radius: 15px;
+}
+
+.sidebar-widget.blog-sidebar .widget {
+border: 1px solid #EEF0F6;
+
+background-color: #fff;
+border-radius: 0px;
+  
+}
+.recent-posts-widget {
+list-style: none;
+padding: 0;
+margin: 0;
+}
+div#thechamphorizontalsharing-14 {
+display:flex;
+}
+.the_champ_sharing_ul {
+margin-top: 18px;
+margin-left: 18px;
+}
+
+
+.recent-post-item {
+display: flex;
+align-items: center;
+margin-bottom: 15px;
+border-bottom: 1px solid #ddd;
+padding-bottom: 10px;
+}
+
+.recent-post-item .post-thumbnail {
+flex: 0 0 80px; /* Set the width of the image */
+margin-right: 15px;
+}
+
+.recent-post-item .post-thumbnail img {
+width: 100%;
+height: auto;
+border-radius: 4px; /* Optional: Add rounded corners */
+}
+
+.post-thumbnail img{
+max-height: 100%;
+}
+
+.recent-post-item .post-details {
+flex-grow: 1;
+}
+
+.recent-post-item .post-title {
+font-size: 16px;
+font-weight: bold;
+color: #333;
+text-decoration: none;
+}
+
+.recent-post-item .post-title:hover {
+color: #0073aa; /* Add hover color */
+}
+
+.recent-post-item .post-date {
+display: block;
+font-size: 12px;
+color: #777;
+margin-top: 5px;
+}
+.large-post {
+position: relative;
+width: 100%;
+margin-bottom: 20px;
+}
+.large-post .post-image img {
+width: 100%;
+height: auto;
+display: block;
+}
+.large-post .post-title {
+position: absolute;
+bottom: 0%;
+min-width: 100%;
+color: #fff;
+font-size: 24px;
+font-weight: bold;
+text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+    background: #1F87E1;
+padding: 26px;
+margin: 0;
+z-index: 2;
+  max-width:100%; 
+box-sizing: border-box;
+
+}
+
+
+
+.large-post h3 {
+  position: absolute;
+bottom: 0%;
+min-width: 100%;
+   color: #fff;
+font-size: 24px;
+font-weight: bold;
+   background: #1F87E1;
+padding: 27px;
+margin: 0;
+text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+z-index: 2;
+   max-width: 100%;
+box-sizing: border-box;
+}
+
+.blog-container {
+
+border-top: 5px solid #0087DD;
+}
+.small-posts .small-post {
+margin-bottom: 15px;
+}
+.small-post {
+background-color: #E7E7E7;
+box-shadow: 2px 4px 10px 0px rgba(0, 0, 0, 0.26);
+}
+.blog-container-post {
+    max-width: 1320px;
+margin: 0 auto;
+padding: 0 15px;
+display: flex;
+flex-wrap: wrap;
+}
+@media (max-width: 768px) {
+.custom-post-grid.layout3 {
+    
+    display: flex;
+    flex-direction: column-reverse;
+}
+}
+
+input[name="submit_profile"] {
+    width: 200px;
+margin-top: 50px;
+display: inline-block;
+font-weight: 400;
+color: #ffffff;
+text-align: center;
+white-space: nowrap;
+-webkit-user-select: none;
+-moz-user-select: none;
+user-select: none;
+background-color: #1B88E4;
+border: 1px solid #1B88E4;
+padding: .5rem 1rem;
+font-size: 1rem;
+border-radius: 14px;
+transition: all .3s;
+
+}
+.widget_thechamphorizontalsharing {
+display : flex;
+}
+@media (max-width: 767.98px)  { 
+.post-image img {
+    width :100% !important;
+        height: max-content !important;
+}
+.small-post-image img {
+    width :100% !important;
+        height: max-content !important;
+}
+}
+@media (min-width: 768px) and (max-width: 991px) {
+    .post-image img {
+    width :100% !important;
+        height: max-content !important;
+}
+
+}
+
+
+.double-opt-in .form-control {
+display: block;
+width: 100%;
+height: calc(1.5em + .75rem + 2px);
+padding: .375rem .75rem;
+font-size: 1rem;
+font-weight: 400;
+line-height: 1.5;
+color: #495057;
+background-color: #fff;
+background-clip: padding-box;
+border: 1px solid #ced4da;
+border-radius: .25rem;
+transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+.double-opt-in .form-group {
+margin-top: 10px;
+}
+
+.double-opt-in .btn-sm{
+color: #fff !important;
+background:#579AF6 !important;
+}
+.double-opt-in .btn-sm:hover{
+color: #000 !important;
+background:#EEE !important;
+border:none !important;
+}
+.double-opt-in .btn-sm:focus {
+outline: 0 !important;
+}
+
+.double-opt-in input:focus {
+ outline-width: 1px;
+outline-color: #66afe9;
+}
+
+.exclusive-cont h1{
+text-overflow:ellipsis;
+overflow:hidden;
+white-space:nowrap;
+width:100%;
+text-align:center;
+position:absolute;
+color:#0087DD;
+align-items:center;
+padding: 0px 20px;
+}
+.zoom-effect {
+overflow: hidden;
+position: relative;
+}
+
+.zoom-effect .image-inner img {
+transition: transform 0.4s ease;
+}
+
+.zoom-effect:hover .image-inner img {
+transform: scale(1.20); /* Zoom out on hover */
+}
+
+/* Hover effect for post title */
+.hover-effect {
+transition: color 0.3s ease;
+}
+
+.hover-effect:hover {
+color: #000 !important; /* Change this to your desired hover color */
 }
